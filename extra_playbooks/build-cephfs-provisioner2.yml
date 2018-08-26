@@ -1,30 +1,12 @@
 ---
 
-#- hosts: localhost
 - hosts: all
   tasks:
-    - name: CephFS Provisioner | Install pip packages
-      pip:
-        name: "{{ item.name }}"
-        version: "{{ item.version }}"
-        state: "{{ item.state }}"
-      with_items:
-        - { state: "present", name: "docker", version: "3.4.1" }
-        - { state: "present", name: "docker-compose", version: "1.21.2" }
-
     - name: CephFS Provisioner | Check Go version
       shell: |
         go version
       ignore_errors: yes
       register: go_version_result
-
-    - name: CephFS Provisioner | Install Go 1.9
-      shell: |
-        add-apt-repository -y ppa:gophers/archive
-        apt-get update
-        apt-get install -y golang-1.9
-        ln -fs /usr/lib/go-1.9/bin/* /usr/local/bin/
-      when: 'go_version_result.rc != 0 or "go version go1.9" not in go_version_result.stdout'
 
     - name: CephFS Provisioner | Check if image exists
       shell: |
@@ -51,5 +33,3 @@
             name: quay.io/kubespray/cephfs-provisioner:4530b2f
             push: yes
           retries: 10
-
-      when: check_image_result.rc != 0
